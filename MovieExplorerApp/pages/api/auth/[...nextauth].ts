@@ -2,7 +2,7 @@ import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { compare } from 'bcryptjs';
 import { connectToDatabase } from '../../../lib/auth';
-import { Session } from 'next-auth';
+import { Session, User, JWT } from 'next-auth';
 
 export const authOptions = {
   providers: [
@@ -29,13 +29,14 @@ export const authOptions = {
     strategy: 'jwt',
   },
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) token.id = user.id;
+    async jwt({ token, user }: { token: JWT; user?: User }) {
+      if (user) {
+        token.id = user.id;
+      }
       return token;
     },
-    async session({ session, token }: { session: Session; token: any }) {
+    async session({ session, token }: { session: Session; token: JWT }) {
       if (token?.id) {
-        // Ensure session.user exists before assigning
         session.user = session.user || {};
         session.user.id = token.id;
       }
