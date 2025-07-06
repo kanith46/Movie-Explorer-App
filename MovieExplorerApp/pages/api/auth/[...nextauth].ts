@@ -2,7 +2,8 @@ import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { compare } from 'bcryptjs';
 import { connectToDatabase } from '../../../lib/auth';
-import { Session, User, JWT } from 'next-auth';
+import { Session, User } from 'next-auth';
+import { JWT } from 'next-auth/jwt';
 
 export const authOptions = {
   providers: [
