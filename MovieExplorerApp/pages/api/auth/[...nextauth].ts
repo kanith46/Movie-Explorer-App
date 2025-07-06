@@ -1,9 +1,10 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { compare, hash } from 'bcryptjs';
+import { compare } from 'bcryptjs';
 import { connectToDatabase } from '../../../lib/auth';
+import { Session } from 'next-auth';
 
-export default NextAuth({
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -32,10 +33,16 @@ export default NextAuth({
       if (user) token.id = user.id;
       return token;
     },
-    async session({ session, token }) {
-      if (token) session.user.id = token.id;
+    async session({ session, token }: { session: Session; token: any }) {
+      if (token?.id) {
+        // Ensure session.user exists before assigning
+        session.user = session.user || {};
+        session.user.id = token.id;
+      }
       return session;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
-});
+};
+
+export default NextAuth(authOptions);
